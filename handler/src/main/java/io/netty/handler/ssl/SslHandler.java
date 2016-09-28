@@ -506,7 +506,9 @@ public class SslHandler extends ByteToMessageDecoder implements ChannelOutboundH
         ByteBufAllocator alloc = ctx.alloc();
         boolean needUnwrap = false;
         try {
-            for (;;) {
+            // Only continue to loop if the handler was not removed in the meantime.
+            // See https://github.com/netty/netty/issues/5860
+            while (!ctx.isRemoved()) {
                 Object msg = pendingUnencryptedWrites.current();
                 if (msg == null) {
                     break;
@@ -593,7 +595,9 @@ public class SslHandler extends ByteToMessageDecoder implements ChannelOutboundH
         ByteBuf out = null;
         ByteBufAllocator alloc = ctx.alloc();
         try {
-            for (;;) {
+            // Only continue to loop if the handler was not removed in the meantime.
+            // See https://github.com/netty/netty/issues/5860
+            while (!ctx.isRemoved()) {
                 if (out == null) {
                     out = allocateOutNetBuf(ctx, 0);
                 }
@@ -954,7 +958,9 @@ public class SslHandler extends ByteToMessageDecoder implements ChannelOutboundH
         boolean notifyClosure = false;
         ByteBuf decodeOut = allocate(ctx, length);
         try {
-            for (;;) {
+            // Only continue to loop if the handler was not removed in the meantime.
+            // See https://github.com/netty/netty/issues/5860
+            while (!ctx.isRemoved()) {
                 final SSLEngineResult result = unwrap(engine, packet, offset, length, decodeOut);
                 final Status status = result.getStatus();
                 final HandshakeStatus handshakeStatus = result.getHandshakeStatus();
